@@ -29,7 +29,17 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "tm4c123gh6pm.h"
+#include "driverlib/sysctl.h"
+
+#include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
+
+#include "hal_defs.h"
+#include "hal_uart.h"
 
 
 #define sizeof_array(arr)		(sizeof(arr)/sizeof(arr[0]))
@@ -38,7 +48,18 @@
 //debug code
 int main(void){
 
+	char str[64] = "Hello World\r\n";
+	//configure system clock
+	SysCtlClockFreqSet(SYSCTL_OSC_INT | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 80e6);
+	
+	
 
-
+	
+	HAL_UART0_Init();
+	HAL_UART1_Init();
+	
+	HAL_UART_Send(&uart0, str, strlen(str));
+	
+	for(;;){}
 
 }
