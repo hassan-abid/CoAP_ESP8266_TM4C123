@@ -1,35 +1,0 @@
-Dependencies for Project 'CoAP_ESP8266_TM4C123', Target 'Target 1': (DO NOT MODIFY !)
-F (.\startup.s)(0x519B99A8)(--cpu Cortex-M4 --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"-I E:\Keil\ARM\RV31\INC-I E:\Keil\ARM\CMSIS\Include-I E:\Keil\ARM\Inc\TI\TM4C123--list .\startup.lst --xref -o .\build\startup.o --depend .\build\startup.d)
-F (..\src\main.c)(0x5A987D36)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections --signed_chars -I..\inc -I..\inc\hw -I..\driverlib -I..\TM4C123 --C99-I E:\Keil\ARM\RV31\INC-I E:\Keil\ARM\CMSIS\Include-I E:\Keil\ARM\Inc\TI\TM4C123-Drvmdk -DPART_LM4F120H5QR -DTM4C1230C3PM-o .\build\main.o --omf_browse .\build\main.crf --depend .\build\main.d)
-I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x51C87C24)
-I (E:\Keil\ARM\ARMCC\include\stdio.h)(0x51C87C24)
-I (E:\Keil\ARM\ARMCC\include\string.h)(0x51C87C24)
-I (E:\Keil\ARM\Inc\TI\TM4C123\tm4c123gh6pm.h)(0x532CAAE8)
-I (E:\Keil\ARM\CMSIS\Include\core_cm4.h)(0x532CAE92)
-I (E:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x532CAE92)
-I (E:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x532CAE92)
-I (E:\Keil\ARM\CMSIS\Include\core_cm4_simd.h)(0x532CAE92)
-I (E:\Keil\ARM\Inc\TI\TM4C123\system_TM4C123.h)(0x532CAAE8)
-F (..\driverlib\src\uart.c)(0x5A987C00)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections --signed_chars -I..\inc -I..\inc\hw -I..\driverlib -I..\TM4C123 --C99-I E:\Keil\ARM\RV31\INC-I E:\Keil\ARM\CMSIS\Include-I E:\Keil\ARM\Inc\TI\TM4C123-Drvmdk -DPART_LM4F120H5QR -DTM4C1230C3PM-o .\build\uart.o --omf_browse .\build\uart.crf --depend .\build\uart.d)
-I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x51C87C24)
-I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x51C87C24)
-I (..\TM4C123\inc/hw_ints.h)(0x5A6D47D1)
-I (..\TM4C123\inc/hw_memmap.h)(0x5A6D47D1)
-I (..\TM4C123\inc/hw_sysctl.h)(0x5A6D47D1)
-I (..\TM4C123\inc/hw_types.h)(0x5A6D47D1)
-I (..\TM4C123\inc/hw_uart.h)(0x5A6D47D1)
-I (..\driverlib\driverlib/debug.h)(0x5A6D47B8)
-I (..\driverlib\driverlib/interrupt.h)(0x5A6D47B8)
-I (..\driverlib\driverlib/uart.h)(0x5A6D47B8)
-F (..\driverlib\src\interrupt.c)(0x5A6D47B8)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections --signed_chars -I..\inc -I..\inc\hw -I..\driverlib -I..\TM4C123 --C99-I E:\Keil\ARM\RV31\INC-I E:\Keil\ARM\CMSIS\Include-I E:\Keil\ARM\Inc\TI\TM4C123-Drvmdk -DPART_LM4F120H5QR -DTM4C1230C3PM-o .\build\interrupt.o --omf_browse .\build\interrupt.crf --depend .\build\interrupt.d)
-I (E:\Keil\ARM\ARMCC\include\stdbool.h)(0x51C87C24)
-I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x51C87C24)
-I (..\TM4C123\inc/hw_ints.h)(0x5A6D47D1)
-I (..\TM4C123\inc/hw_nvic.h)(0x5A6D47D1)
-I (..\TM4C123\inc/hw_types.h)(0x5A6D47D1)
-I (..\driverlib\driverlib/cpu.h)(0x5A6D47B8)
-I (..\driverlib\driverlib/debug.h)(0x5A6D47B8)
-I (..\driverlib\driverlib/interrupt.h)(0x5A6D47B8)
-F (..\driverlib\src\cpu.c)(0x5A6D47B8)(-c --cpu Cortex-M4 -D__EVAL -D__MICROLIB -g -O0 --apcs=interwork --split_sections --signed_chars -I..\inc -I..\inc\hw -I..\driverlib -I..\TM4C123 --C99-I E:\Keil\ARM\RV31\INC-I E:\Keil\ARM\CMSIS\Include-I E:\Keil\ARM\Inc\TI\TM4C123-Drvmdk -DPART_LM4F120H5QR -DTM4C1230C3PM-o .\build\cpu.o --omf_browse .\build\cpu.crf --depend .\build\cpu.d)
-I (E:\Keil\ARM\ARMCC\include\stdint.h)(0x51C87C24)
-I (..\driverlib\driverlib/cpu.h)(0x5A6D47B8)

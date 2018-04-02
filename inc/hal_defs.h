@@ -21,10 +21,16 @@ typedef enum{
 
 }HAL_Return_t;
 
+#define HAL_ASSERT_RETURN(cond, retValue)	\
+	if (cond)\
+		return retValue;
+
 #ifdef __cplusplus
 extern "C"{
 #endif 
  
+uint32_t HAL_getTicks(void);
+
 
 #ifdef __cplusplus
 }
