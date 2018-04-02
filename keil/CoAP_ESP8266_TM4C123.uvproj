@@ -362,7 +362,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>rvmdk PART_TM4C123GH6PM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\inc\hw;..\driverlib;..\TM4C123</IncludePath>
+              <IncludePath>..\inc;..\inc\hw;..\driverlib;..\TM4C123;..\OS\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -459,6 +459,41 @@
               <FileName>hal_uart_int.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\hal_uart_int.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>OS</GroupName>
+          <Files>
+            <File>
+              <FileName>OS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\OS\src\OS.c</FilePath>
+            </File>
+            <File>
+              <FileName>OS_FIFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\OS\src\OS_FIFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>OS_Logger.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\OS\src\OS_Logger.c</FilePath>
+            </File>
+            <File>
+              <FileName>OS_Signal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\OS\src\OS_Signal.c</FilePath>
+            </File>
+            <File>
+              <FileName>OS_Task_Lists.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\OS\src\OS_Task_Lists.c</FilePath>
+            </File>
+            <File>
+              <FileName>List.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\OS\src\List.c</FilePath>
             </File>
           </Files>
         </Group>
