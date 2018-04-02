@@ -23,7 +23,6 @@
 #include "hal_uart.h"
 #include "hal_uart_private.h"
 
-#include "mQueue.h"
 
 
 #define UART_TX_FIFO_SIZE_DEFAULT			((uint32_t)64)
@@ -93,7 +92,8 @@ HAL_Return_t HAL_UART_TxCallback(HAL_UART_t* uart)
 	else
 	{
 		UARTIntDisable((uint32_t)uart->base, UART_INT_TX);
-		HAL_UART_TxCompleteCallback(uart);
+		if (uart->txCompleteCallback)
+			uart->txCompleteCallback(uart);
 	}
 	
 	return HAL_OK;
@@ -111,7 +111,8 @@ HAL_Return_t HAL_UART_RxCallback(HAL_UART_t* uart)
 	if (uart->rxCount == 0)
 	{
 		UARTIntDisable((uint32_t)uart->base, UART_INT_RX);
-		HAL_UART_RxCompleteCallback(uart);
+		if (uart->rxCompleteCallback)
+			uart->rxCompleteCallback(uart);
 	}
 	
 	return HAL_OK;
@@ -223,10 +224,12 @@ HAL_Return_t HAL_UART_ReceiveBlocking(HAL_UART_t* uart, uint8_t* str, uint32_t l
 }
 
 
-HAL_Return_t HAL_UART_Send(HAL_UART_t* uart, uint8_t* str, uint32_t len)
+HAL_Return_t HAL_UART_Send(HAL_UART_t* uart,
+							uint8_t* str,
+							uint32_t len,
+							TxCompleteCallback txCompleteCallback)
 {
 	HAL_Return_t ret;
-	uint32_t rxFIFOLevel, txFIFOLevel;
 	HAL_UART_LOCK(uart);
 	
 	if (uart->txCount)
@@ -237,26 +240,27 @@ HAL_Return_t HAL_UART_Send(HAL_UART_t* uart, uint8_t* str, uint32_t len)
 	
 	uart->txBuffer = str;
 	uart->txCount = len;
+	uart->txCompleteCallback = txCompleteCallback;
 
 	//The interrupt must be enabled first in the HAL_UARTx_Init() function
 	//by calling INTEnable(INT_UARTx).	
 	
-	UARTFIFOLevelGet((uint32_t)uart->base, &txFIFOLevel, &rxFIFOLevel);
-	UARTFIFOLevelSet((uint32_t)uart->base, UART_FIFO_TX1_8, rxFIFOLevel);
-
 	UARTIntEnable((uint32_t)uart->base, UART_INT_TX);
 	UARTCharPutNonBlocking((uint32_t)uart->base, *uart->txBuffer);
 		
+
 	ret = HAL_OK;
 	error:
 	HAL_UART_UNLOCK(uart);
 	return ret;
 }
 
-HAL_Return_t HAL_UART_Receive(HAL_UART_t* uart, uint8_t* str, uint32_t len)
+HAL_Return_t HAL_UART_Receive(HAL_UART_t* uart,
+								uint8_t* str,
+								uint32_t len,
+								RxCompleteCallback rxCompleteCallback)
 {
 	HAL_Return_t ret;
-	uint32_t rxFIFOLevel, txFIFOLevel;
 	HAL_UART_LOCK(uart);
 	
 	if (uart->rxCount)
@@ -267,9 +271,8 @@ HAL_Return_t HAL_UART_Receive(HAL_UART_t* uart, uint8_t* str, uint32_t len)
 	
 	uart->rxBuffer = str;
 	uart->rxCount = len;
+	uart->rxCompleteCallback = rxCompleteCallback;
 	
-	UARTFIFOLevelGet((uint32_t)uart->base, &txFIFOLevel, &rxFIFOLevel);
-	UARTFIFOLevelSet((uint32_t)uart->base, txFIFOLevel, UART_FIFO_RX1_8);
 	UARTIntEnable((uint32_t)uart->base, UART_INT_RX);
 	
 	ret = HAL_OK;

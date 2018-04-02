@@ -31,11 +31,15 @@
 #include <string.h>
 #include <stdbool.h>
 #include "tm4c123gh6pm.h"
-#include "driverlib/sysctl.h"
 
+#include "driverlib/sysctl.h"
+#include "driverlib/gpio.h"
 
 #include "hal_defs.h"
 #include "hal_uart.h"
+
+
+#include "OS.h"
 
 
 #define sizeof_array(arr)		(sizeof(arr)/sizeof(arr[0]))
@@ -46,11 +50,11 @@ uint8_t rxStr[64];
 uint8_t txStr[64];
 
 
-void HAL_UART_RxCompleteCallback(void)
+void HAL_UART_RxCompleteCallback(HAL_UART_t* uart)
 {
 	memcpy(txStr, rxStr, RX_LENGTH);
-	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH);
-	HAL_UART_Send(&uart0, txStr, RX_LENGTH);
+	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, HAL_UART_RxCompleteCallback);
+	HAL_UART_Send(&uart0, txStr, RX_LENGTH, NULL);
 
 }
 
@@ -59,19 +63,45 @@ void HAL_UART_TxCompleteCalback(void)
 
 }
 
+void blink(void)
+{
+	  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF))
+    {
+    }
+
+    GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_3);
+     
+		while(1)
+		{
+			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, GPIO_PIN_3);
+
+			OS_Sleep(1000);
+			
+			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, 0x0);
+			
+			OS_Sleep(1000);
+		}
+
+	
+}
+
 //debug code
 int main(void){
 
 	//configure system clock
 	SysCtlClockFreqSet(SYSCTL_OSC_INT | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 80e6);
 	
-	
-
+	OS_Init();
+	OS_AddThread(&blink, "Blink", OS_TASK_PRIORITY_HIGH);
 	
 	HAL_UART0_Init();
 	HAL_UART1_Init();
 		
-	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH);
+	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, &HAL_UART_RxCompleteCallback);
+	
+	OS_Start(1000);
 	
 	for(;;){}
 

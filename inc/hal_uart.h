@@ -27,6 +27,9 @@ typedef struct HAL_UART_t HAL_UART_t;
 HAL_UART_LIST(__HAL_UART_EXPORT);
 
 
+typedef void (*TxCompleteCallback)(HAL_UART_t* uart);
+typedef void (*RxCompleteCallback)(HAL_UART_t* uart);
+
 
 
 #ifdef __cplusplus
@@ -37,11 +40,18 @@ HAL_Return_t HAL_UART0_Init(void);
 
 HAL_Return_t HAL_UART1_Init(void);
 
-HAL_Return_t HAL_UART_Send(HAL_UART_t* uart, uint8_t* str, uint32_t len);
+HAL_Return_t HAL_UART_Send(HAL_UART_t* uart,
+							uint8_t* str,
+							uint32_t len,
+							TxCompleteCallback txCompleteCallback);
 
 HAL_Return_t HAL_UART_SendBlocking(HAL_UART_t* uart, uint8_t* str, uint32_t len, uint32_t timeout);
 
-HAL_Return_t HAL_UART_Receive(HAL_UART_t* uart, uint8_t* str, uint32_t len);
+HAL_Return_t HAL_UART_Receive(HAL_UART_t* uart,
+								uint8_t* str,
+								uint32_t len,
+								RxCompleteCallback rxCompleteCallback);
+
 
 HAL_Return_t HAL_UART_ReceiveBlocking(HAL_UART_t* uart, uint8_t* str, uint32_t len, uint32_t timeout);
 
