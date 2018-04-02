@@ -447,6 +447,21 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>hal</GroupName>
+          <Files>
+            <File>
+              <FileName>hal_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\hal_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_uart_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\hal_uart_int.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
   </Targets>
