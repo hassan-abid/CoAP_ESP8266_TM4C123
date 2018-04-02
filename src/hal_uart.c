@@ -15,22 +15,44 @@
 #include "driverlib/uart.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
+#include "driverlib/interrupt.h"
+
+#include "inc/hw_ints.h"
 
 #include "hal_defs.h"
 #include "hal_uart.h"
+#include "hal_uart_private.h"
+
+#include "mQueue.h"
+
+
+#define UART_TX_FIFO_SIZE_DEFAULT			((uint32_t)64)
+#define UART_RX_FIFO_SIZE_DEFAULT			((uint32_t)64)
+
+
+#define HAL_UART_LOCK(uart)				
+#define HAL_UART_UNLOCK(uart)			
 
 
 
 #define __HAL_UART_DEFINE(index, ...) \
 	HAL_UART_t uart##index = {.base = UART##index, \
-							};\
+														};\
 
 
 
 
+
+/**
+ * @defgroup	hal_uart_Private_Members		hal_uart Private Members
+ * @{
+ */
+
+/** @} */
 
 
 HAL_UART_LIST(__HAL_UART_DEFINE)
+
 
 
 /**
@@ -38,6 +60,63 @@ HAL_UART_LIST(__HAL_UART_DEFINE)
  * @{
  */
 
+HAL_Return_t HAL_UART_Init(HAL_UART_t* uart)
+{
+	UARTConfigSetExpClk((uint32_t)uart->base, SysCtlClockGet(), 
+													uart->baudrate, uart->config);
+
+	UARTFIFODisable((uint32_t)uart->base);
+	
+	return HAL_OK;
+}
+
+
+__weak void HAL_UART_TxCompleteCallback(HAL_UART_t* uart)
+{
+	
+}
+
+
+__weak void HAL_UART_RxCompleteCallback(HAL_UART_t* uart)
+{
+	
+}
+
+HAL_Return_t HAL_UART_TxCallback(HAL_UART_t* uart)
+{
+	if (uart->txCount)
+	{
+		uart->txCount--;
+		uart->txBuffer++;
+		UARTCharPutNonBlocking((uint32_t)uart->base, *(uart->txBuffer));
+	}
+	else
+	{
+		UARTIntDisable((uint32_t)uart->base, UART_INT_TX);
+		HAL_UART_TxCompleteCallback(uart);
+	}
+	
+	return HAL_OK;
+}
+
+HAL_Return_t HAL_UART_RxCallback(HAL_UART_t* uart)
+{
+	if (uart->rxCount)
+	{
+		uart->rxCount--;
+		*uart->rxBuffer = UARTCharGetNonBlocking((uint32_t)uart->base);
+		uart->rxBuffer++;
+	}
+	
+	if (uart->rxCount == 0)
+	{
+		UARTIntDisable((uint32_t)uart->base, UART_INT_RX);
+		HAL_UART_RxCompleteCallback(uart);
+	}
+	
+	return HAL_OK;
+		
+}
 
 /** @}*/
 
@@ -68,7 +147,8 @@ HAL_Return_t HAL_UART0_Init(void)
 
 	GPIOPinTypeUART(GPIOA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-	UARTConfigSetExpClk((uint32_t)uart0.base, SysCtlClockGet(), uart0.baudrate, uart0.config);
+	HAL_UART_Init(&uart0);
+	IntEnable(INT_UART0);
 
 	return HAL_OK;
 }
@@ -93,21 +173,110 @@ HAL_Return_t HAL_UART1_Init(void)
 
 	GPIOPinTypeUART(GPIOB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-	UARTConfigSetExpClk((uint32_t)uart1.base, SysCtlClockGet(), uart1.baudrate, uart1.config);
+	HAL_UART_Init(&uart1);
 
 	return HAL_OK;
 }
 
 
-
-HAL_Return_t HAL_UART_Send(HAL_UART_t* uart, char* str, uint32_t len)
+/**
+ *
+ * @param uart
+ * @param str
+ * @param len
+ * @param timeout
+ * @return
+ */
+HAL_Return_t HAL_UART_SendBlocking(HAL_UART_t* uart, uint8_t* str, uint32_t len, uint32_t timeout)
 {
+	///@todo : Add timeout functionality
 	for(int i = 0 ; i < len ; i++)
 	{
 		UARTCharPut((uint32_t)uart->base, str[i]);
 	}
-
+	
+	
 	return HAL_OK;
 }
+
+
+/**
+ *
+ * @param uart
+ * @param str
+ * @param len
+ * @param timeout
+ * @return
+ */
+HAL_Return_t HAL_UART_ReceiveBlocking(HAL_UART_t* uart, uint8_t* str, uint32_t len, uint32_t timeout)
+{
+
+	HAL_UART_LOCK(uart);
+	///@todo : add timeout functionality
+	for(int i = 0 ; i < len ; i++)
+	{
+		str[i] = UARTCharGet((uint32_t)uart->base);
+	}
+	
+	HAL_UART_UNLOCK(uart);
+	return HAL_OK;
+}
+
+
+HAL_Return_t HAL_UART_Send(HAL_UART_t* uart, uint8_t* str, uint32_t len)
+{
+	HAL_Return_t ret;
+	uint32_t rxFIFOLevel, txFIFOLevel;
+	HAL_UART_LOCK(uart);
+	
+	if (uart->txCount)
+	{
+		ret = HAL_BUSY;
+		goto error;
+	}
+	
+	uart->txBuffer = str;
+	uart->txCount = len;
+
+	//The interrupt must be enabled first in the HAL_UARTx_Init() function
+	//by calling INTEnable(INT_UARTx).	
+	
+	UARTFIFOLevelGet((uint32_t)uart->base, &txFIFOLevel, &rxFIFOLevel);
+	UARTFIFOLevelSet((uint32_t)uart->base, UART_FIFO_TX1_8, rxFIFOLevel);
+
+	UARTIntEnable((uint32_t)uart->base, UART_INT_TX);
+	UARTCharPutNonBlocking((uint32_t)uart->base, *uart->txBuffer);
+		
+	ret = HAL_OK;
+	error:
+	HAL_UART_UNLOCK(uart);
+	return ret;
+}
+
+HAL_Return_t HAL_UART_Receive(HAL_UART_t* uart, uint8_t* str, uint32_t len)
+{
+	HAL_Return_t ret;
+	uint32_t rxFIFOLevel, txFIFOLevel;
+	HAL_UART_LOCK(uart);
+	
+	if (uart->rxCount)
+	{
+		ret = HAL_BUSY;
+		goto error;
+	}
+	
+	uart->rxBuffer = str;
+	uart->rxCount = len;
+	
+	UARTFIFOLevelGet((uint32_t)uart->base, &txFIFOLevel, &rxFIFOLevel);
+	UARTFIFOLevelSet((uint32_t)uart->base, txFIFOLevel, UART_FIFO_RX1_8);
+	UARTIntEnable((uint32_t)uart->base, UART_INT_RX);
+	
+	ret = HAL_OK;
+	error:
+	HAL_UART_UNLOCK(uart);
+	return ret;
+}
+
 
 /** @}*/

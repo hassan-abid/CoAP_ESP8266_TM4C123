@@ -33,10 +33,6 @@
 #include "tm4c123gh6pm.h"
 #include "driverlib/sysctl.h"
 
-#include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
 
 #include "hal_defs.h"
 #include "hal_uart.h"
@@ -44,11 +40,28 @@
 
 #define sizeof_array(arr)		(sizeof(arr)/sizeof(arr[0]))
 
+#define RX_LENGTH			((uint32_t)5)
+
+uint8_t rxStr[64];
+uint8_t txStr[64];
+
+
+void HAL_UART_RxCompleteCallback(void)
+{
+	memcpy(txStr, rxStr, RX_LENGTH);
+	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH);
+	HAL_UART_Send(&uart0, txStr, RX_LENGTH);
+
+}
+
+void HAL_UART_TxCompleteCalback(void)
+{
+
+}
 
 //debug code
 int main(void){
 
-	char str[64] = "Hello World\r\n";
 	//configure system clock
 	SysCtlClockFreqSet(SYSCTL_OSC_INT | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 80e6);
 	
@@ -57,8 +70,8 @@ int main(void){
 	
 	HAL_UART0_Init();
 	HAL_UART1_Init();
-	
-	HAL_UART_Send(&uart0, str, strlen(str));
+		
+	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH);
 	
 	for(;;){}
 
