@@ -23,7 +23,6 @@
 #include "hal_uart.h"
 #include "hal_uart_private.h"
 
-#include "mQueue.h"
 
 
 #define UART_TX_FIFO_SIZE_DEFAULT			((uint32_t)64)
