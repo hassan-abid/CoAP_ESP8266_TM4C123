@@ -22,7 +22,30 @@
 
 void HAL_UART_TxCallback(HAL_UART_t* uart);
 void HAL_UART_RxCallback(HAL_UART_t* uart);
+void HAL_UART_IdleCallback(HAL_UART_t* uart);
 
+static inline void UART_Handler(HAL_UART_t* uart)
+{
+	uint32_t irqStatus;
+
+	irqStatus = UARTIntStatus((uint32_t)uart->base, true);
+
+	if (irqStatus & UART_INT_TX)
+	{
+		HAL_UART_TxCallback(uart);
+	}
+	
+	if (irqStatus & UART_INT_RX)
+	{
+		HAL_UART_RxCallback(uart);
+	}
+	
+	if (irqStatus & UART_INT_RT)
+	{
+		HAL_UART_IdleCallback(uart);
+	}
+
+}
 
 /** @}*/
 
@@ -31,22 +54,21 @@ void HAL_UART_RxCallback(HAL_UART_t* uart);
  * @{
  */
 
+
+
 void UART0_Handler(void)
+{	
+	UART_Handler(&uart0);
+}
+
+void UART1_Handler(void)
 {
-	uint32_t irqStatus;
+	UART_Handler(&uart1);
+}
 
-	irqStatus = UARTIntStatus((uint32_t)uart0.base, true);
-
-	if (irqStatus & UART_INT_TX)
-	{
-		HAL_UART_TxCallback(&uart0);
-	}
-	
-	if (irqStatus & UART_INT_RX)
-	{
-		HAL_UART_RxCallback(&uart0);
-	}
-	
+void UART2_Handler(void)
+{
+	UART_Handler(&uart2);
 }
 
 

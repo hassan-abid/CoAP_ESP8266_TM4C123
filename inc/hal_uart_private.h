@@ -10,6 +10,8 @@
 #define INC_HAL_UART_PRIVATE_H_
 
 
+
+
 typedef struct HAL_UART_t{
 
 	UART0_Type* const base;
@@ -39,6 +41,10 @@ typedef struct HAL_UART_t{
 	uint8_t* rxBuffer;
 	uint32_t rxCount;
 
+	RxCompleteCallback rxCompleteCallback;
+	TxCompleteCallback txCompleteCallback;
+
+	void* parent;
 
 }HAL_UART_t;
 
