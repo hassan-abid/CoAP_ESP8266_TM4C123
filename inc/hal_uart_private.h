@@ -44,6 +44,8 @@ typedef struct HAL_UART_t{
 	RxCompleteCallback rxCompleteCallback;
 	TxCompleteCallback txCompleteCallback;
 
+	void* parent;
+
 }HAL_UART_t;
 
 

@@ -17,7 +17,10 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/interrupt.h"
 
+#include "inc/hw_types.h"
 #include "inc/hw_ints.h"
+#include "inc/hw_gpio.h"
+
 
 #include "hal_defs.h"
 #include "hal_uart.h"
@@ -70,17 +73,6 @@ HAL_Return_t HAL_UART_Init(HAL_UART_t* uart)
 }
 
 
-__weak void HAL_UART_TxCompleteCallback(HAL_UART_t* uart)
-{
-	
-}
-
-
-__weak void HAL_UART_RxCompleteCallback(HAL_UART_t* uart)
-{
-	
-}
-
 HAL_Return_t HAL_UART_TxCallback(HAL_UART_t* uart)
 {
 	if (uart->txCount)
@@ -119,6 +111,19 @@ HAL_Return_t HAL_UART_RxCallback(HAL_UART_t* uart)
 		
 }
 
+HAL_Return_t HAL_UART_IdleCallback(HAL_UART_t* uart)
+{
+	//if the idle interrupt is enabled,
+	//we are expecting variable length data, 
+	//in which case, call the rxCompleteCallback
+	//when this interrupt is fired.
+	
+	UARTIntDisable((uint32_t)uart->base, UART_INT_RX);
+	uart->rxCompleteCallback(uart);
+		
+	return HAL_OK;
+}
+
 /** @}*/
 
 /**
@@ -150,9 +155,11 @@ HAL_Return_t HAL_UART0_Init(void)
 
 	HAL_UART_Init(&uart0);
 	IntEnable(INT_UART0);
+	UARTIntEnable((uint32_t)uart0.base, UART_INT_RT);
 
 	return HAL_OK;
 }
+
 
 /**
  *
@@ -160,8 +167,8 @@ HAL_Return_t HAL_UART0_Init(void)
  */
 HAL_Return_t HAL_UART1_Init(void)
 {
-	uart1.baudrate = 115200;
-	uart1.config = 	UART_CONFIG_PAR_NONE | 
+	uart1.baudrate = 9600;
+	uart1.config = 	UART_CONFIG_PAR_NONE |
 									UART_CONFIG_STOP_ONE | 
 									UART_CONFIG_WLEN_8;
 
@@ -172,10 +179,47 @@ HAL_Return_t HAL_UART1_Init(void)
 	GPIOPinConfigure(GPIO_PB0_U1RX);
 	GPIOPinConfigure(GPIO_PB1_U1TX);
 
+
 	GPIOPinTypeUART(GPIOB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
 	HAL_UART_Init(&uart1);
+	IntEnable(INT_UART1);
+	//UARTIntEnable((uint32_t)uart1.base, UART_INT_RT);
+	
+	return HAL_OK;
+}
 
+
+/**
+ *
+ * @return
+ */
+HAL_Return_t HAL_UART2_Init(void)
+{
+	uart2.baudrate = 115200;
+	uart2.config = 	UART_CONFIG_PAR_NONE |
+									UART_CONFIG_STOP_ONE | 
+									UART_CONFIG_WLEN_8;
+
+
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART2);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
+
+	//PD7 must be unlocked
+	HWREG(GPIOD_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
+	HWREG(GPIOD_BASE + GPIO_O_CR) = (0x01 << 7);
+
+	GPIOPinConfigure(GPIO_PD6_U2RX);
+	GPIOPinConfigure(GPIO_PD7_U2TX);
+	GPIOPinTypeUART(GPIOD_BASE, GPIO_PIN_6 | GPIO_PIN_7);
+
+	HWREG(GPIOD_BASE + GPIO_O_CR) = 0x00;
+	HWREG(GPIOD_BASE + GPIO_O_LOCK) = 0;
+
+	HAL_UART_Init(&uart2);
+	IntEnable(INT_UART2);
+	UARTIntEnable((uint32_t)uart2.base, UART_INT_RT);
+	
 	return HAL_OK;
 }
 

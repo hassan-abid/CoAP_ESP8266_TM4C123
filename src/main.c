@@ -37,8 +37,10 @@
 
 #include "hal_defs.h"
 #include "hal_uart.h"
+#include "hal_gpio.h"
 
-
+#include "AT.h"
+#include "ESP8266.h"
 #include "OS.h"
 
 
@@ -46,21 +48,51 @@
 
 #define RX_LENGTH			((uint32_t)5)
 
+#define fifoPush(fifo, data)	\
+	(fifo)->buff[(fifo)->end++] = data;\
+	if ((fifo)->end >= sizeof((fifo)->buff))\
+		(fifo)->end = 0;\
+	
+	
+#define FIFO_DEF(name, size, type)	\
+	struct{\
+		type buff[size];\
+		uint32_t count;\
+		uint32_t end;\
+	}	name = {.count = 0, .end = 0}
+		
+		
+FIFO_DEF(rxPCFIFO, 512, char);
+FIFO_DEF(rxESP8266FIFO, 512, char);
+	
 uint8_t rxStr[64];
 uint8_t txStr[64];
 
+uint8_t rxPC, txPC, rxESP8266, txESP8266;
 
-void HAL_UART_RxCompleteCallback(HAL_UART_t* uart)
+
+char cmd[64];
+
+static AT_t* AT;
+
+void PC_rxComplete(HAL_UART_t* uart)
 {
-	memcpy(txStr, rxStr, RX_LENGTH);
-	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, HAL_UART_RxCompleteCallback);
-	HAL_UART_Send(&uart0, txStr, RX_LENGTH, NULL);
-
+	txESP8266 = rxPC;
+	fifoPush(&rxPCFIFO, rxPC);
+	HAL_UART_Send(&uart2, &txESP8266, 1, NULL);
+	HAL_UART_Receive(&uart0, &rxPC, 1, PC_rxComplete);
 }
 
-void HAL_UART_TxCompleteCalback(void)
-{
 
+void ESP8266_rxComplete(HAL_UART_t* uart)
+{
+	fifoPush(&rxESP8266FIFO, rxESP8266);
+	HAL_UART_Receive(&uart2, &rxESP8266, 1, ESP8266_rxComplete);
+}
+
+void ESP8266_txComplete(HAL_UART_t* uart)
+{
+	
 }
 
 void blink(void)
@@ -87,6 +119,29 @@ void blink(void)
 	
 }
 
+
+extern ESP8266_WiFi_t esp8266;
+void wifiThread(void)
+{
+	static char cmd[] = "AT\r\n";
+	ESP8266_Init(&esp8266);
+	while(1)
+	{
+		OS_Sleep(1000);
+		HAL_UART_SendBlocking(&uart2, cmd, strlen(cmd), 1000);
+	}
+	
+}
+
+
+void transparentUART(void)
+{
+	
+	while(1)
+	{
+		gets(cmd);
+	}
+}
 //debug code
 int main(void){
 
@@ -95,11 +150,16 @@ int main(void){
 	
 	OS_Init();
 	OS_AddThread(&blink, "Blink", OS_TASK_PRIORITY_HIGH);
+	OS_AddThread(&wifiThread, "WiFi", OS_TASK_PRIORITY_HIGH);
 	
+	HAL_GPIO_Init();
 	HAL_UART0_Init();
-	HAL_UART1_Init();
-		
-	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, &HAL_UART_RxCompleteCallback);
+	HAL_UART2_Init();
+	
+	
+	
+	HAL_UART_Receive(&uart2, &rxESP8266, 1, &ESP8266_rxComplete);
+	
 	
 	OS_Start(1000);
 	

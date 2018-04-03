@@ -6,11 +6,17 @@
  * 
  */
 
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "tm4c123gh6pm.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
 
-#include "hal_gpio.h"
 #include "hal_defs.h"
+#include "hal_gpio.h"
+
 
 
 /**
@@ -26,23 +32,29 @@
  * @{
  */
 
-HAL_Return_t HAL_GPIO_Init(HAL_GPIO_Port_t* port, HAL_GPIO_Pins_t pins)
+HAL_Return_t HAL_GPIO_Init()
 {
-
+	//initialize LEDs.
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+	GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_3);
+	
+	//Initialize ESP8266 GPIO
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+	GPIOPinTypeGPIOOutput(GPIOB_BASE, GPIO_PIN_5);
 	return HAL_OK;
 }
 
 
-HAL_Return_t HAL_GPIO_SetPin(HAL_GPIO_Port_t* port, HAL_GPIO_Pins_t pins)
+HAL_Return_t HAL_GPIO_SetPin(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins)
 {
-	GPIOPinWrite(port, pins, 1);
+	GPIOPinWrite((uint32_t)port, pins, 1);
 	return HAL_OK;
 }
 
 
 HAL_Return_t HAL_GPIO_ResetPin(HAL_GPIO_Port_t* port, HAL_GPIO_Pins_t pins)
 {
-	GPIOPinWrite(port, pins, 0);
+	GPIOPinWrite((uint32_t)port, pins, 0);
 	return HAL_OK;
 }
 
