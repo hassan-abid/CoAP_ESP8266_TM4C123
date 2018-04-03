@@ -32,16 +32,19 @@ static inline void UART_Handler(HAL_UART_t* uart)
 
 	if (irqStatus & UART_INT_TX)
 	{
+		UARTIntClear((uint32_t)uart->base, UART_INT_TX);
 		HAL_UART_TxCallback(uart);
 	}
 	
 	if (irqStatus & UART_INT_RX)
 	{
+		UARTIntClear((uint32_t)uart->base, UART_INT_RX);
 		HAL_UART_RxCallback(uart);
 	}
 	
 	if (irqStatus & UART_INT_RT)
 	{
+		UARTIntClear((uint32_t)uart->base, UART_INT_RT);
 		HAL_UART_IdleCallback(uart);
 	}
 

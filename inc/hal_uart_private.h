@@ -11,11 +11,21 @@
 
 
 
+typedef enum
+{
+	UART_READY,
+	UART_BUSY_TX = 1<<0,
+	UART_BUSY_RX = 1<<1,
+	UART_BUSY_RX_IDLE = 1<<2
+	
+}HAL_UART_State_t;
+
 
 typedef struct HAL_UART_t{
 
 	UART0_Type* const base;
 
+	HAL_UART_State_t state;
 
 	uint32_t baudrate;
 
@@ -43,6 +53,7 @@ typedef struct HAL_UART_t{
 
 	RxCompleteCallback rxCompleteCallback;
 	TxCompleteCallback txCompleteCallback;
+	IdleCallback			 idleCallback;
 
 	void* parent;
 

@@ -69,18 +69,23 @@ uint8_t rxStr[64];
 uint8_t txStr[64];
 
 uint8_t rxPC, txPC, rxESP8266, txESP8266;
-
+uint8_t PC_txComplete = 0;
 
 char cmd[64];
 
 static AT_t* AT;
 
-void PC_rxComplete(HAL_UART_t* uart)
+void PC_rxCompleteCallback(HAL_UART_t* uart)
 {
-	txESP8266 = rxPC;
 	fifoPush(&rxPCFIFO, rxPC);
-	HAL_UART_Send(&uart2, &txESP8266, 1, NULL);
-	HAL_UART_Receive(&uart0, &rxPC, 1, PC_rxComplete);
+	memcpy(txStr, rxStr, RX_LENGTH);
+	HAL_UART_Send(&uart0, txStr, RX_LENGTH, NULL);
+	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, PC_rxCompleteCallback);
+}
+
+void PC_txCompleteCallback(HAL_UART_t* uart)
+{
+	PC_txComplete = 1;
 }
 
 
@@ -97,13 +102,6 @@ void ESP8266_txComplete(HAL_UART_t* uart)
 
 void blink(void)
 {
-	  SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF))
-    {
-    }
-
-    GPIOPinTypeGPIOOutput(GPIOF_BASE, GPIO_PIN_3);
      
 		while(1)
 		{
@@ -125,10 +123,12 @@ void wifiThread(void)
 {
 	static char cmd[] = "AT\r\n";
 	ESP8266_Init(&esp8266);
+
 	while(1)
 	{
 		OS_Sleep(1000);
-		HAL_UART_SendBlocking(&uart2, cmd, strlen(cmd), 1000);
+		//HAL_UART_SendBlocking(&uart2, cmd, strlen(cmd), 1000);
+		//AT_sendCommand(AT, "AT\r\n", 1000);
 	}
 	
 }
@@ -156,10 +156,10 @@ int main(void){
 	HAL_UART0_Init();
 	HAL_UART2_Init();
 	
+	AT = AT_Init(&uart2);
 	
 	
-	HAL_UART_Receive(&uart2, &rxESP8266, 1, &ESP8266_rxComplete);
-	
+	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, PC_rxCompleteCallback);
 	
 	OS_Start(1000);
 	

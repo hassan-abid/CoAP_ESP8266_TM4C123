@@ -23,7 +23,13 @@ typedef struct AT_t{
 
 	OS_Semaphore_t rxComplete;
 
-	uint8_t rxBuffer[512];
+	struct {
+			
+		char str[512];
+		char*	argv[10];
+		uint32_t argc;
+	
+	}response;
 
 }AT_t;
 
@@ -35,6 +41,9 @@ static AT_t AT;
  * @{
  */
 
+uint16_t split(char *buffer, char **_argv, uint32_t _argc, const char *tokens);
+
+
 void AT_uartRxCompleteCallback(HAL_UART_t* uart)
 {
 	OS_Signal(&((AT_t*)uart->parent)->rxComplete);
@@ -43,6 +52,26 @@ void AT_uartRxCompleteCallback(HAL_UART_t* uart)
 static inline void AT_waitResponse(AT_t* AT, uint32_t timeout)
 {
 	OS_Wait(&AT->rxComplete);
+
+	AT->response.argc = split(AT->response.str, AT->response.argv, sizeof(AT->response.argv), "\r\n");
+}
+
+uint16_t split(char *buffer, char **_argv, uint32_t _argc, const char *tokens)
+{
+    uint16_t i;
+    uint16_t counter = 0;
+
+    char *result = strtok( buffer, tokens );
+
+    for( i=0; i < _argc; i++ )
+    {
+        if ( result )
+            counter++;
+
+        _argv[ i ] = result;
+        result = strtok( NULL, tokens );
+    }
+    return counter;
 }
 
 /** @}*/
@@ -59,7 +88,7 @@ AT_t* AT_Init(HAL_UART_t* uart)
 
 	OS_InitSemaphore(&AT.rxComplete, 0);
 
-	return AT_OK;
+	return &AT;
 }
 
 
@@ -73,7 +102,7 @@ AT_Return_t AT_sendCommand(AT_t* AT, char* cmd, uint32_t timeout)
 			AT_ERROR);
 
 	HAL_ASSERT_RETURN(
-			HAL_OK != HAL_UART_Receive(AT->uart, AT->rxBuffer, sizeof(AT->rxBuffer), AT_uartRxCompleteCallback),
+			HAL_OK != HAL_UART_Receive(AT->uart, AT->response.str, sizeof(AT->response.str), AT_uartRxCompleteCallback),
 			AT_ERROR);
 
 	AT_waitResponse(AT, timeout);
