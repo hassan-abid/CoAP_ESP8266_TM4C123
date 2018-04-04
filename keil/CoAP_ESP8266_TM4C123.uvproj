@@ -460,6 +460,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\hal_uart_int.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\hal_gpio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -494,6 +499,21 @@
               <FileName>List.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\OS\src\List.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>ESP8266</GroupName>
+          <Files>
+            <File>
+              <FileName>ESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\ESP8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>AT.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\AT.c</FilePath>
             </File>
           </Files>
         </Group>

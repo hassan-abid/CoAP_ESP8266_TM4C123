@@ -18,6 +18,8 @@ typedef enum{
 
 }AT_Return_t;
 
+struct AT_Response_t;
+typedef struct AT_Response_t AT_Response_t;
 
 struct AT_t;
 typedef struct AT_t AT_t;
@@ -28,7 +30,7 @@ extern "C"{
  
 AT_t* AT_Init(HAL_UART_t* uart);
 AT_Return_t AT_sendCommand(AT_t* AT, char* cmd, uint32_t timeout);
-
+char* AT_checkResponse(AT_Response_t* response, char* str);
 
 #ifdef __cplusplus
 }
