@@ -22,8 +22,8 @@
 
 #define ESP8266_RST						GPIOB, GPIO_PIN_5
 
-#define ESP8266_GPIO_Set(pin)				HAL_GPIO_SetPin(pin)
-#define ESP8266_GPIO_Reset(pin)			HAL_GPIO_ResetPin(pin)
+#define ESP8266_GPIO_Set(pin)				HAL_GPIO_PinSet(pin)
+#define ESP8266_GPIO_Reset(pin)			HAL_GPIO_PinReset(pin)
 
 #define ESP8266_Delay(ms)				OS_Sleep(ms)
 

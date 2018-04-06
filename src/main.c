@@ -128,7 +128,6 @@ void wifiThread(void)
 	{
 		OS_Sleep(1000);
 		//HAL_UART_SendBlocking(&uart2, cmd, strlen(cmd), 1000);
-		AT_sendCommand(AT, "AT\r\n", 1000);
 	}
 	
 }

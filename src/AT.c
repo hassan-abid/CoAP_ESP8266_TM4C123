@@ -8,6 +8,9 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+
 
 #include "hal_uart.h"
 #include "hal_uart_private.h"
@@ -15,6 +18,8 @@
 
 #include "OS.h"
 
+
+#define sizeof_array( arr )					(sizeof(arr) / sizeof(arr[0]))
 
 typedef struct AT_Response_t{
 	
@@ -56,7 +61,7 @@ static inline void AT_waitResponse(AT_t* AT, uint32_t timeout)
 {
 	OS_Wait(&AT->rxComplete);
 
-	AT->response.argc = split(AT->response.str, AT->response.argv, sizeof(AT->response.argv), "\r\n");
+	AT->response.argc = split(AT->response.str, AT->response.argv, sizeof_array(AT->response.argv), "\r\n");
 	AT->response.iter = 0;
 }
 
@@ -97,9 +102,8 @@ AT_t* AT_Init(HAL_UART_t* uart)
 }
 
 
-AT_Return_t AT_sendCommand(AT_t* AT, char* cmd, uint32_t timeout)
+AT_Return_t AT_sendCommand(AT_t* AT, uint32_t timeout, char* cmd)
 {
-	HAL_Return_t hal_ret;
 	uint32_t endTime = 0;
 
 	HAL_ASSERT_RETURN(
@@ -119,6 +123,18 @@ AT_Return_t AT_sendCommand(AT_t* AT, char* cmd, uint32_t timeout)
 	return AT_OK;
 }
 
+AT_Return_t AT_sendCommandf(AT_t* AT, uint32_t timeout, char* cmd, ...)
+{
+		//process the formatted string
+	static char buff[512 + 1];	//buffer to store the final string to be sent.
+	__va_list args;
+	va_start(args, cmd);
+	vsnprintf(buff, sizeof(buff) - 1, cmd, args);
+	va_end(args);
+	
+	return AT_sendCommand(AT, timeout, buff);
+}
+
 char* AT_checkResponse(AT_Response_t* response, char* str)
 {
 	uint32_t index = 0;
@@ -134,6 +150,11 @@ char* AT_checkResponse(AT_Response_t* response, char* str)
 		}
 	}
 	return responseStr;
+}
+
+AT_Response_t* AT_getResponseStruct(AT_t* AT)
+{
+	return &AT->response;
 }
 
 /** @}*/

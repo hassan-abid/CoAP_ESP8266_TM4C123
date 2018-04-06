@@ -506,14 +506,14 @@
           <GroupName>ESP8266</GroupName>
           <Files>
             <File>
-              <FileName>ESP8266.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\ESP8266.c</FilePath>
-            </File>
-            <File>
               <FileName>AT.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\AT.c</FilePath>
+            </File>
+            <File>
+              <FileName>ESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\ESP8266.c</FilePath>
             </File>
           </Files>
         </Group>

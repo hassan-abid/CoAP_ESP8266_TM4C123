@@ -9,6 +9,7 @@
 #ifndef INC_AT_H_
 #define INC_AT_H_
 
+#include "hal_uart.h"
 
 typedef enum{
 
@@ -29,8 +30,12 @@ extern "C"{
 #endif 
  
 AT_t* AT_Init(HAL_UART_t* uart);
-AT_Return_t AT_sendCommand(AT_t* AT, char* cmd, uint32_t timeout);
+AT_Return_t AT_sendCommand(AT_t* AT, uint32_t timeout, char* cmd);
+AT_Return_t AT_sendCommandf(AT_t* AT, uint32_t timeout, char* cmd, ...);
+
 char* AT_checkResponse(AT_Response_t* response, char* str);
+AT_Response_t* AT_getResponseStruct(AT_t* AT);
+
 
 #ifdef __cplusplus
 }

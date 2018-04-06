@@ -45,14 +45,14 @@ HAL_Return_t HAL_GPIO_Init()
 }
 
 
-HAL_Return_t HAL_GPIO_SetPin(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins)
+HAL_Return_t HAL_GPIO_PinSet(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins)
 {
 	GPIOPinWrite((uint32_t)port, pins, 1);
 	return HAL_OK;
 }
 
 
-HAL_Return_t HAL_GPIO_ResetPin(HAL_GPIO_Port_t* port, HAL_GPIO_Pins_t pins)
+HAL_Return_t HAL_GPIO_PinReset(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins)
 {
 	GPIOPinWrite((uint32_t)port, pins, 0);
 	return HAL_OK;
