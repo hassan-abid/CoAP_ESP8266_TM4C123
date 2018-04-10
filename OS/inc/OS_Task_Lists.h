@@ -76,12 +76,15 @@
 /**
  * Add a task to the delayed list
  */
-#define addTaskToDelayedList(task)		addTaskToList(&delayedTasksList, (task))
+#define addTaskToDelayedList(task) \
+					(task)->stateListItem.value = (task)->sleepTimer;\
+					addTaskToOrderedList(&delayedTasksList, (task))
 
 /**
  * Remove a task from the delayed list.
  */
-#define removeTaskFromDelayedList(task)		removeTaskFromList(&delayedTasksList, (task))
+#define removeTaskFromDelayedList(task)		\
+					removeTaskFromList(&delayedTasksList, (task))
 
 
 #define addTaskToSignalList(event, task)	\

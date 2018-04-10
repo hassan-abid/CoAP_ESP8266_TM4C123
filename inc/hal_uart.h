@@ -30,7 +30,7 @@ HAL_UART_LIST(__HAL_UART_EXPORT);
 
 typedef void (*TxCompleteCallback)(HAL_UART_t* uart);
 typedef void (*RxCompleteCallback)(HAL_UART_t* uart);
-typedef void (*IdleCallback)		  (HAL_UART_t* uart);
+typedef void (*IdleCallback)		  (HAL_UART_t* uart, uint32_t bytesReceived);
 
 
 #ifdef __cplusplus

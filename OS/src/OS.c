@@ -135,17 +135,27 @@ __asm void StartFirstTask(void)
 void SysTick_Handler(void)
 {
 	uint32_t sr;
-
+	TCB_t* delayedTask;
+	
 	sr = StartCritical();
 	OS_sysTicks++;
 	#if OS_USE_PREEMPTION == 1
 	Yeild();
 	#endif
 	
-	TCBhistory[TCBhistoryCounter++] = currentTCB;
-	if (TCBhistoryCounter >= 100)
-		TCBhistoryCounter = 0;
-	
+	while (List_getSize(&delayedTasksList))
+	{
+			
+		delayedTask = (TCB_t*)List_getLastElement( &delayedTasksList );
+		
+		if (delayedTask->sleepTimer > OS_sysTicks)
+			break;
+		
+		removeTaskFromDelayedList(delayedTask);
+		addTaskToReadyList(delayedTask);
+
+	}
+
 	EndCritical(sr);
 }
 
@@ -392,12 +402,14 @@ uint32_t OS_clearTickCount(void)
  */
 void OS_Sleep(uint32_t ticks)
 {
-	uint32_t startTicks = OS_getTickCount();
+	uint32_t sr = StartCritical();
 	
-	while ( startTicks + ticks > OS_getTickCount())
-	{
-		Yeild();
-	}
+	currentTCB->sleepTimer = ticks + OS_sysTicks;
+	removeTaskFromReadyList(currentTCB);
+	addTaskToDelayedList(currentTCB);
+	Yeild();
+	
+	EndCritical(sr);
 }
 
 /**

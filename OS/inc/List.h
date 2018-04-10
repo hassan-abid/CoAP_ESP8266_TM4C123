@@ -37,6 +37,7 @@ typedef struct List_t{
 #define List_getNextElement( item )				List_getElement((item)->next)
 #define List_getPreviousElement( item )		List_getElement((item)->prev)
 #define List_getFirstElement( list )			List_getElement((list)->end->next)
+#define List_getLastElement( list )				List_getElement((list)->end)
 #define List_getSize( list )							((list)->size)
 
 #define List_RemoveFirstElement( list ) 	List_Remove( (list), List_getFirstElement( (list) ) )
