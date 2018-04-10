@@ -38,11 +38,11 @@
 #include "hal_defs.h"
 #include "hal_uart.h"
 #include "hal_gpio.h"
-
-#include "AT.h"
-#include "ESP8266.h"
 #include "OS.h"
 
+
+#include "ESP8266.h"
+#include "coap.h"
 
 #define sizeof_array(arr)		(sizeof(arr)/sizeof(arr[0]))
 
@@ -73,30 +73,46 @@ uint8_t PC_txComplete = 0;
 
 char cmd[64];
 
-
-void PC_rxCompleteCallback(HAL_UART_t* uart)
-{
-	fifoPush(&rxPCFIFO, rxPC);
-	memcpy(txStr, rxStr, RX_LENGTH);
-	HAL_UART_Send(&uart0, txStr, RX_LENGTH, NULL);
-	HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, PC_rxCompleteCallback);
-}
-
-void PC_txCompleteCallback(HAL_UART_t* uart)
-{
-	PC_txComplete = 1;
-}
-
-
-void ESP8266_rxComplete(HAL_UART_t* uart)
-{
-	fifoPush(&rxESP8266FIFO, rxESP8266);
-	HAL_UART_Receive(&uart2, &rxESP8266, 1, ESP8266_rxComplete);
-}
-
-void ESP8266_txComplete(HAL_UART_t* uart)
-{
+uint8_t scratch_raw[1024];
+coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
 	
+	
+ESP8266_Return_t ESP8266_IPDCallback(ESP8266_WiFi_t* esp, uint32_t linkID, uint8_t* data, uint32_t length)
+{
+	int rc;
+	coap_packet_t pkt, rsppkt;
+	size_t rsplen;
+	
+	coap_dump(data, length, true);
+	printf("\r\n");
+	if (0 != (rc = coap_parse(&pkt, data, length)))
+            printf("Bad packet rc=%d\n", rc);
+	else
+	{
+		coap_dumpPacket(&pkt);
+	
+		coap_handle_req(&scratch_buf, &pkt, &rsppkt);
+		rsplen = 1024;
+		
+		if (0 != (rc = coap_build(data, &rsplen, &rsppkt)))
+				printf("coap_build failed rc=%d\n", rc);
+		else
+		{
+				printf("Sending: ");
+				coap_dump(data, rsplen, true);
+				printf("\n");
+				coap_dumpPacket(&rsppkt);
+
+				//sendto(fd, buf, rsplen, 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
+				ESP8266_sendData(esp, linkID, data, rsplen);
+		}
+	}
+	return ESP8266_OK;
+}
+
+void put_light_Callback(uint8_t state)
+{
+	HAL_GPIO_PinWrite(GPIOF, GPIO_PIN_3, state);
 }
 
 void blink(void)
@@ -104,13 +120,14 @@ void blink(void)
      
 		while(1)
 		{
-			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, GPIO_PIN_3);
+//			//printf("Hello World\r\n");
+//			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, GPIO_PIN_3);
 
-			OS_Sleep(1000);
-			
-			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, 0x0);
-			
-			OS_Sleep(1000);
+//			OS_Sleep(1000);
+//			
+//			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, 0x0);
+//			
+//			OS_Sleep(1000);
 		}
 
 	
@@ -120,8 +137,10 @@ void blink(void)
 extern ESP8266_WiFi_t esp8266;
 void wifiThread(void)
 {
+	coap_setup();
 	ESP8266_Init(&esp8266);
-
+	
+	
 	while(1)
 	{
 		OS_Sleep(1000);
@@ -152,8 +171,8 @@ int main(void){
 	HAL_GPIO_Init();
 	HAL_UART0_Init();
 	HAL_UART2_Init();	
-	
 	//HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, PC_rxCompleteCallback);
+	
 	
 	OS_Start(1000);
 	

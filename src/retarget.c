@@ -23,7 +23,8 @@
  * @defgroup retarget.c_Public_Functions	retarget.c Public Functions
  * @{
  */
-int fputc(int ch, FILE *f) {
+int fputc(int ch, FILE *f) 
+{
 
 	//UART_OutChar(ch);
 	HAL_UART_SendBlocking(&uart0, (uint8_t*)&ch, 1, 1000);

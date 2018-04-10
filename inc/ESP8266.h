@@ -30,7 +30,9 @@ extern "C"{
 ESP8266_Return_t ESP8266_Init(ESP8266_WiFi_t* esp);
 ESP8266_Return_t ESP8266_Reset(ESP8266_WiFi_t* esp);
 
-
+ESP8266_Return_t ESP8266_sendData(ESP8266_WiFi_t* esp, uint8_t linkID,
+																			uint8_t* data, uint32_t length);
+	
 #ifdef __cplusplus
 }
 #endif
