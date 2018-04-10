@@ -224,10 +224,15 @@ ESP8266_Return_t ESP8266_sendData(ESP8266_WiFi_t* esp, uint8_t linkID,
 	return ESP8266_OK;
 }
 
+__weak ESP8266_Return_t ESP8266_IPDCallback(ESP8266_WiFi_t* esp, uint32_t linkID, uint8_t* data, uint32_t length)
+{
+	
+}
+
 ESP8266_Return_t ESP8266_startUDPServer(ESP8266_WiFi_t* esp, uint32_t port)
 {
 	ESP8266_Return_t ret;
-	static char udpData[64];
+	static char udpData[1024];
 	char* dataPtr;
 	int iter = 0;
 	uint32_t linkID;
@@ -260,8 +265,10 @@ ESP8266_Return_t ESP8266_startUDPServer(ESP8266_WiFi_t* esp, uint32_t port)
 			continue;
 		
 		dataPtr += iter;
-		memcpy(udpData, dataPtr, min(dataLength, sizeof(udpData)));
-		ESP8266_sendData(esp, linkID, (uint8_t*)udpData, dataLength);
+		dataLength = min(dataLength, sizeof(udpData));
+		memcpy(udpData, dataPtr, dataLength);
+		//ESP8266_sendData(esp, linkID, (uint8_t*)udpData, dataLength);
+		ESP8266_IPDCallback(esp, linkID, udpData, dataLength);
 	}
 	
 	return ret;

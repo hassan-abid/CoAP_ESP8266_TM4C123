@@ -362,7 +362,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>rvmdk PART_TM4C123GH6PM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\inc\hw;..\driverlib;..\TM4C123;..\OS\inc</IncludePath>
+              <IncludePath>..\inc;..\inc\hw;..\driverlib;..\TM4C123;..\OS\inc;..\CoAP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -414,6 +414,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>retarget.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\retarget.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -514,6 +519,21 @@
               <FileName>ESP8266.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\ESP8266.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>CoAP</GroupName>
+          <Files>
+            <File>
+              <FileName>coap.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CoAP\coap.c</FilePath>
+            </File>
+            <File>
+              <FileName>endpoints.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CoAP\endpoints.c</FilePath>
             </File>
           </Files>
         </Group>
