@@ -155,7 +155,24 @@
           <Name>-O207 -S0 -C0 -FO7  -FN1 -FC800 -FD20000000 -FF0TM4C123_256 -FL040000 -FS00</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>315</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>4422</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\src\ESP8266.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -172,6 +189,26 @@
           <WinNumber>1</WinNumber>
           <ItemText>uart2</ItemText>
         </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>readyTasksList</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>delayedTasksList</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>TCB[1]</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>\\CoAP_ESP8266_TM4C123\../src/AT.c\AT.rxComplete</ItemText>
+        </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
@@ -184,7 +221,7 @@
         <Mm>
           <WinNumber>2</WinNumber>
           <SubType>8</SubType>
-          <ItemText>\\CoAP_ESP8266_TM4C123\../src/AT.c\AT.response.str</ItemText>
+          <ItemText>udpData</ItemText>
         </Mm>
       </MemoryWindow2>
       <Tracepoint>
@@ -193,7 +230,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -249,10 +286,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>140</TopLine>
-      <CurrentLine>148</CurrentLine>
+      <TopLine>122</TopLine>
+      <CurrentLine>157</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -275,8 +312,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1154</TopLine>
+      <CurrentLine>1160</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\driverlib\src\uart.c</PathWithFileName>
       <FilenameWithoutPath>uart.c</FilenameWithoutPath>
@@ -291,8 +328,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>878</TopLine>
-      <CurrentLine>883</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\driverlib\src\interrupt.c</PathWithFileName>
       <FilenameWithoutPath>interrupt.c</FilenameWithoutPath>
@@ -361,10 +398,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>69</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>163</TopLine>
-      <CurrentLine>164</CurrentLine>
+      <TopLine>141</TopLine>
+      <CurrentLine>147</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\hal_uart.c</PathWithFileName>
       <FilenameWithoutPath>hal_uart.c</FilenameWithoutPath>
@@ -379,8 +416,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>49</TopLine>
-      <CurrentLine>75</CurrentLine>
+      <TopLine>42</TopLine>
+      <CurrentLine>48</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\hal_uart_int.c</PathWithFileName>
       <FilenameWithoutPath>hal_uart_int.c</FilenameWithoutPath>
@@ -417,10 +454,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>86</TopLine>
-      <CurrentLine>102</CurrentLine>
+      <TopLine>202</TopLine>
+      <CurrentLine>207</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\OS\src\OS.c</PathWithFileName>
       <FilenameWithoutPath>OS.c</FilenameWithoutPath>
@@ -481,7 +518,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>47</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -497,10 +534,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>2</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>140</TopLine>
-      <CurrentLine>148</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\OS\src\List.c</PathWithFileName>
       <FilenameWithoutPath>List.c</FilenameWithoutPath>
@@ -523,8 +560,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>63</TopLine>
-      <CurrentLine>64</CurrentLine>
+      <TopLine>155</TopLine>
+      <CurrentLine>164</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\AT.c</PathWithFileName>
       <FilenameWithoutPath>AT.c</FilenameWithoutPath>
@@ -539,8 +576,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>226</TopLine>
-      <CurrentLine>234</CurrentLine>
+      <TopLine>257</TopLine>
+      <CurrentLine>262</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\ESP8266.c</PathWithFileName>
       <FilenameWithoutPath>ESP8266.c</FilenameWithoutPath>

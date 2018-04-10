@@ -128,8 +128,11 @@ HAL_Return_t HAL_UART_TxCallback(HAL_UART_t* uart)
 
 HAL_Return_t HAL_UART_RxCallback(HAL_UART_t* uart)
 {
-	rxFIFOGet(uart, &uart->rxBuffer, &uart->rxCount);
-
+	//rxFIFOGet(uart, &uart->rxBuffer, &uart->rxCount);
+	*uart->rxBuffer = UARTCharGetNonBlocking((uint32_t)uart->base);
+	uart->rxBuffer++;
+	uart->rxCount--;
+	
 	//if the rxCount is zero, there is no more space 
 	//left in the buffer, in which case, the UART rx 
 	//process should stop, whether it is waiting for 
@@ -141,7 +144,7 @@ HAL_Return_t HAL_UART_RxCallback(HAL_UART_t* uart)
 		if (uart->state & UART_BUSY_RX && uart->rxCompleteCallback)
 			uart->rxCompleteCallback(uart);
 		else if(uart->state & UART_BUSY_RX_IDLE && uart->idleCallback)
-			uart->idleCallback(uart);
+			uart->idleCallback(uart, uart->rxBuffer - uart->rxBufferStart);
 	}
 	return HAL_OK;
 		
@@ -157,9 +160,8 @@ HAL_Return_t HAL_UART_IdleCallback(HAL_UART_t* uart)
 	//In such a case, we need to read the fifo into the buffer 
 	//and disable the uart interrupt when the specified number of
 	//characters have been received.
-	
 	rxFIFOGet(uart, &uart->rxBuffer, &uart->rxCount);
-
+	
 	
 	if (uart->state & UART_BUSY_RX &&
 			uart->rxCount == 0)
@@ -182,7 +184,7 @@ HAL_Return_t HAL_UART_IdleCallback(HAL_UART_t* uart)
 		UARTIntDisable((uint32_t)uart->base, UART_INT_RX);
 		uart->state &= ~UART_BUSY_RX_IDLE;
 		if (uart->idleCallback)
-			uart->idleCallback(uart);
+			uart->idleCallback(uart, uart->rxBuffer - uart->rxBufferStart);
 	}
 		
 	return HAL_OK;
@@ -434,6 +436,8 @@ HAL_Return_t HAL_UART_ReceiveUntilIdle(HAL_UART_t* uart,
 	uart->rxCount = len;
 	uart->rxCompleteCallback = NULL;
 	uart->idleCallback = idleCallback;
+	
+	uart->rxBufferStart = str;
 	
 	UARTFIFOLevelGet((uint32_t)uart->base, &txFifoLevel, &rxFifoLevel);
 	UARTFIFOLevelSet((uint32_t)uart->base, txFifoLevel, UART_FIFO_RX7_8);

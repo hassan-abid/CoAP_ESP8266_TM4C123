@@ -50,6 +50,7 @@ typedef struct HAL_UART_t{
 
 	uint8_t* rxBuffer;
 	uint32_t rxCount;
+	uint8_t* rxBufferStart;
 
 	RxCompleteCallback rxCompleteCallback;
 	TxCompleteCallback txCompleteCallback;

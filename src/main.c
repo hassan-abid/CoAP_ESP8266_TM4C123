@@ -73,7 +73,6 @@ uint8_t PC_txComplete = 0;
 
 char cmd[64];
 
-static AT_t* AT;
 
 void PC_rxCompleteCallback(HAL_UART_t* uart)
 {
@@ -121,7 +120,6 @@ void blink(void)
 extern ESP8266_WiFi_t esp8266;
 void wifiThread(void)
 {
-	static char cmd[] = "AT\r\n";
 	ESP8266_Init(&esp8266);
 
 	while(1)
@@ -153,10 +151,7 @@ int main(void){
 	
 	HAL_GPIO_Init();
 	HAL_UART0_Init();
-	HAL_UART2_Init();
-	
-	AT = AT_Init(&uart2);
-	
+	HAL_UART2_Init();	
 	
 	//HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, PC_rxCompleteCallback);
 	

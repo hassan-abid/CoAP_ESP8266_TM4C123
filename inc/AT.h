@@ -30,12 +30,15 @@ extern "C"{
 #endif 
  
 AT_t* AT_Init(HAL_UART_t* uart);
+AT_Return_t AT_waitResponse(AT_t* AT, uint32_t timeout);
+
+AT_Return_t AT_sendRaw(AT_t* AT, uint32_t timeout, uint8_t* data, uint32_t length);
 AT_Return_t AT_sendCommand(AT_t* AT, uint32_t timeout, char* cmd);
 AT_Return_t AT_sendCommandf(AT_t* AT, uint32_t timeout, char* cmd, ...);
 
 char* AT_checkResponse(AT_Response_t* response, char* str);
 AT_Response_t* AT_getResponseStruct(AT_t* AT);
-
+void AT_splitLines(AT_Response_t* response);
 
 #ifdef __cplusplus
 }
