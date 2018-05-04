@@ -362,7 +362,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>rvmdk PART_TM4C123GH6PM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\inc;..\inc\hw;..\driverlib;..\TM4C123;..\OS\inc;..\CoAP</IncludePath>
+              <IncludePath>..\inc;..\driverlib;..\TM4C123;..\OS\inc;..\CoAP</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

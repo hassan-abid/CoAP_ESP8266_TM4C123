@@ -2,43 +2,28 @@
 //
 // can.h - Defines and Macros for the CAN controller.
 //
-// Copyright (c) 2006-2017 Texas Instruments Incorporated.  All rights reserved.
+// Copyright (c) 2006-2010 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
 // 
-//   Redistribution and use in source and binary forms, with or without
-//   modification, are permitted provided that the following conditions
-//   are met:
+// Texas Instruments (TI) is supplying this software for use solely and
+// exclusively on TI's microcontroller products. The software is owned by
+// TI and/or its suppliers, and is protected under applicable copyright
+// laws. You may not combine this software with "viral" open-source
+// software in order to form a larger program.
 // 
-//   Redistributions of source code must retain the above copyright
-//   notice, this list of conditions and the following disclaimer.
+// THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
+// NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
+// NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
+// CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+// DAMAGES, FOR ANY REASON WHATSOEVER.
 // 
-//   Redistributions in binary form must reproduce the above copyright
-//   notice, this list of conditions and the following disclaimer in the
-//   documentation and/or other materials provided with the  
-//   distribution.
-// 
-//   Neither the name of Texas Instruments Incorporated nor the names of
-//   its contributors may be used to endorse or promote products derived
-//   from this software without specific prior written permission.
-// 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
-// This is part of revision 2.1.4.178 of the Tiva Peripheral Driver Library.
+// This is part of revision 6075 of the Stellaris Peripheral Driver Library.
 //
 //*****************************************************************************
 
-#ifndef __DRIVERLIB_CAN_H__
-#define __DRIVERLIB_CAN_H__
+#ifndef __CAN_H__
+#define __CAN_H__
 
 //*****************************************************************************
 //
@@ -66,29 +51,32 @@ extern "C"
 
 //*****************************************************************************
 //
-// These are the flags used by the tCANMsgObject.ui32Flags value when calling
-// the CANMessageSet() and CANMessageGet() functions.
+// These are the flags used by the tCANMsgObject.ulFlags value when calling the
+// CANMessageSet() and CANMessageGet() functions.
 //
 //*****************************************************************************
 
 //
-//! This indicates that transmit interrupts are enabled.
+//! This definition is used with the tCANMsgObject ulFlags value and indicates
+//! that transmit interrupts should be enabled, or are enabled.
 //
 #define MSG_OBJ_TX_INT_ENABLE   0x00000001
 
 //
-//! This indicates that receive interrupts are enabled.
+//! This indicates that receive interrupts should be enabled, or are
+//! enabled.
 //
 #define MSG_OBJ_RX_INT_ENABLE   0x00000002
 
 //
-//! This indicates that a message object is using an extended identifier.
+//! This indicates that a message object will use or is using an extended
+//! identifier.
 //
 #define MSG_OBJ_EXTENDED_ID     0x00000004
 
 //
-//! This indicates that a message object is using filtering based on the
-//! object's message identifier.
+//! This indicates that a message object will use or is using filtering
+//! based on the object's message identifier.
 //
 #define MSG_OBJ_USE_ID_FILTER   0x00000008
 
@@ -104,14 +92,14 @@ extern "C"
 #define MSG_OBJ_DATA_LOST       0x00000100
 
 //
-//! This indicates that a message object uses or is using filtering
+//! This indicates that a message object will use or is using filtering
 //! based on the direction of the transfer.  If the direction filtering is
 //! used, then ID filtering must also be enabled.
 //
 #define MSG_OBJ_USE_DIR_FILTER  (0x00000010 | MSG_OBJ_USE_ID_FILTER)
 
 //
-//! This indicates that a message object uses or is using message
+//! This indicates that a message object will use or is using message
 //! identifier filtering based on the extended identifier.  If the extended
 //! identifier filtering is used, then ID filtering must also be enabled.
 //
@@ -152,28 +140,28 @@ typedef struct
     //
     //! The CAN message identifier used for 11 or 29 bit identifiers.
     //
-    uint32_t ui32MsgID;
+    uint32_t ulMsgID;
 
     //
     //! The message identifier mask used when identifier filtering is enabled.
     //
-    uint32_t ui32MsgIDMask;
+    uint32_t ulMsgIDMask;
 
     //
     //! This value holds various status flags and settings specified by
     //! tCANObjFlags.
     //
-    uint32_t ui32Flags;
+    uint32_t ulFlags;
 
     //
     //! This value is the number of bytes of data in the message object.
     //
-    uint32_t ui32MsgLen;
+    uint32_t ulMsgLen;
 
     //
     //! This is a pointer to the message object's data.
     //
-    uint8_t *pui8MsgData;
+    uint8_t *pucMsgData;
 }
 tCANMsgObject;
 
@@ -191,25 +179,25 @@ typedef struct
     //! Buffer 1 segments, measured in time quanta.  The valid values for this
     //! setting range from 2 to 16.
     //
-    uint32_t ui32SyncPropPhase1Seg;
+    unsigned int uSyncPropPhase1Seg;
 
     //
     //! This value holds the Phase Buffer 2 segment in time quanta.  The valid
     //! values for this setting range from 1 to 8.
     //
-    uint32_t ui32Phase2Seg;
+    unsigned int uPhase2Seg;
 
     //
     //! This value holds the Resynchronization Jump Width in time quanta.  The
     //! valid values for this setting range from 1 to 4.
     //
-    uint32_t ui32SJW;
+    unsigned int uSJW;
 
     //
     //! This value holds the CAN_CLK divider used to determine time quanta.
     //! The valid values for this setting range from 1 to 1023.
     //
-    uint32_t ui32QuantumPrescaler;
+    unsigned int uQuantumPrescaler;
 }
 tCANBitClkParms;
 
@@ -284,15 +272,15 @@ tCANStsReg;
 
 //
 //! This flag is used to allow a CAN controller to generate any CAN
-//! interrupts.  If this is not set, then no interrupts are generated
+//! interrupts.  If this is not set, then no interrupts will be generated
 //! by the CAN controller.
 //
 #define CAN_INT_MASTER          0x00000002
 
 //*****************************************************************************
 //
-//! This definition is used to determine the type of message object that is
-//! set up via a call to the CANMessageSet() API.
+//! This definition is used to determine the type of message object that will
+//! be set up via a call to the CANMessageSet() API.
 //
 //*****************************************************************************
 typedef enum
@@ -403,39 +391,45 @@ tMsgObjType;
 
 //*****************************************************************************
 //
-// Close the Doxygen group.
-//! @}
-//
-//*****************************************************************************
-
-//*****************************************************************************
-//
 // API Function prototypes
 //
 //*****************************************************************************
-extern void CANBitTimingGet(uint32_t ui32Base, tCANBitClkParms *psClkParms);
-extern void CANBitTimingSet(uint32_t ui32Base, tCANBitClkParms *psClkParms);
-extern uint32_t CANBitRateSet(uint32_t ui32Base, uint32_t ui32SourceClock,
-                              uint32_t ui32BitRate);
-extern void CANDisable(uint32_t ui32Base);
-extern void CANEnable(uint32_t ui32Base);
-extern bool CANErrCntrGet(uint32_t ui32Base, uint32_t *pui32RxCount,
-                          uint32_t *pui32TxCount);
-extern void CANInit(uint32_t ui32Base);
-extern void CANIntClear(uint32_t ui32Base, uint32_t ui32IntClr);
-extern void CANIntDisable(uint32_t ui32Base, uint32_t ui32IntFlags);
-extern void CANIntEnable(uint32_t ui32Base, uint32_t ui32IntFlags);
-extern void CANIntRegister(uint32_t ui32Base, void (*pfnHandler)(void));
-extern uint32_t CANIntStatus(uint32_t ui32Base, tCANIntStsReg eIntStsReg);
-extern void CANIntUnregister(uint32_t ui32Base);
-extern void CANMessageClear(uint32_t ui32Base, uint32_t ui32ObjID);
-extern void CANMessageGet(uint32_t ui32Base, uint32_t ui32ObjID,
-                          tCANMsgObject *psMsgObject, bool bClrPendingInt);
-extern void CANMessageSet(uint32_t ui32Base, uint32_t ui32ObjID,
-                          tCANMsgObject *psMsgObject, tMsgObjType eMsgType);
-extern bool CANRetryGet(uint32_t ui32Base);
-extern void CANRetrySet(uint32_t ui32Base, bool bAutoRetry);
-extern uint32_t CANStatusGet(uint32_t ui32Base, tCANStsReg eStatusReg);
+extern void CANBitTimingGet(uint32_t ulBase, tCANBitClkParms *pClkParms);
+extern void CANBitTimingSet(uint32_t ulBase, tCANBitClkParms *pClkParms);
+extern uint32_t CANBitRateSet(uint32_t ulBase,
+                                   uint32_t ulSourceClock,
+                                   uint32_t ulBitRate);
+extern void CANDisable(uint32_t ulBase);
+extern void CANEnable(uint32_t ulBase);
+extern tBoolean CANErrCntrGet(uint32_t ulBase, uint32_t *pulRxCount,
+                              uint32_t *pulTxCount);
+extern void CANInit(uint32_t ulBase);
+extern void CANIntClear(uint32_t ulBase, uint32_t ulIntClr);
+extern void CANIntDisable(uint32_t ulBase, uint32_t ulIntFlags);
+extern void CANIntEnable(uint32_t ulBase, uint32_t ulIntFlags);
+extern void CANIntRegister(uint32_t ulBase, void (*pfnHandler)(void));
+extern uint32_t CANIntStatus(uint32_t ulBase,
+                                  tCANIntStsReg eIntStsReg);
+extern void CANIntUnregister(uint32_t ulBase);
+extern void CANMessageClear(uint32_t ulBase, uint32_t ulObjID);
+extern void CANMessageGet(uint32_t ulBase, uint32_t ulObjID,
+                          tCANMsgObject *pMsgObject, tBoolean bClrPendingInt);
+extern void CANMessageSet(uint32_t ulBase, uint32_t ulObjID,
+                          tCANMsgObject *pMsgObject, tMsgObjType eMsgType);
+extern tBoolean CANRetryGet(uint32_t ulBase);
+extern void CANRetrySet(uint32_t ulBase, tBoolean bAutoRetry);
+extern uint32_t CANStatusGet(uint32_t ulBase, tCANStsReg eStatusReg);
+
+//*****************************************************************************
+//
+// Several CAN APIs have been renamed, with the original function name being
+// deprecated.  These defines provide backward compatibility.
+//
+//*****************************************************************************
+#ifndef DEPRECATED
+#define CANSetBitTiming(a, b)   CANBitTimingSet(a, b)
+#define CANGetBitTiming(a, b)   CANBitTimingGet(a, b)
+#endif
 
 //*****************************************************************************
 //
@@ -446,4 +440,11 @@ extern uint32_t CANStatusGet(uint32_t ui32Base, tCANStsReg eStatusReg);
 }
 #endif
 
-#endif // __DRIVERLIB_CAN_H__
+//*****************************************************************************
+//
+// Close the Doxygen group.
+//! @}
+//
+//*****************************************************************************
+
+#endif //  __CAN_H__

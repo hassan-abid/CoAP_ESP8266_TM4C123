@@ -45,6 +45,10 @@
 // Macros for hardware access, both direct and via the bit-band region.
 //
 //*****************************************************************************
+typedef unsigned char tBoolean;
+
+
+
 #define HWREG(x)                                                              \
         (*((volatile uint32_t *)(x)))
 #define HWREGH(x)                                                             \

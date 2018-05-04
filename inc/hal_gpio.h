@@ -31,6 +31,12 @@ HAL_Return_t HAL_GPIO_PinSet(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pin);
 HAL_Return_t HAL_GPIO_PinReset(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pin);
 
 HAL_Return_t HAL_GPIO_PinWrite(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins, uint8_t state);
+
+HAL_Return_t HAL_GPIO_PinToggle(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins);
+
+uint32_t HAL_GPIO_PinRead(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins);
+
+	
 #ifdef __cplusplus
 }
 #endif

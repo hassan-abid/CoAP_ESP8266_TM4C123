@@ -75,6 +75,7 @@ void List_Init(List_t* list)
 void List_InsertSorted(List_t* list, ListItem_t* item)
 {
 	ListItem_t* iter;
+	uint32_t count;
 
 	if (list->end == NULL)
 	{
@@ -83,15 +84,21 @@ void List_InsertSorted(List_t* list, ListItem_t* item)
 	}
 
 	//iterate the list until the desired index
+	count = 0;
 	for (	iter = list->end->next ;
-			iter->value <= item->value && iter != list->end;
+			iter->value > item->value && count < list->size;
 			iter = iter->next)
 	{
-
+		count++;
 	}
 
 	//insert the item in the list before the item
 	//whose value is lower.
+	if (iter->prev == list->end)
+	{
+		if (list->end->value > item->value)
+			list->end = item;
+	}
 	insert(list, iter->prev, item );
 
 }
