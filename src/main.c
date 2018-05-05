@@ -43,6 +43,8 @@
 
 #include "ESP8266.h"
 #include "coap.h"
+#include "CAN_Msg_Defs.h"
+#include "can0.h"
 
 #define sizeof_array(arr)		(sizeof(arr)/sizeof(arr[0]))
 
@@ -64,6 +66,7 @@
 		
 FIFO_DEF(rxPCFIFO, 512, char);
 FIFO_DEF(rxESP8266FIFO, 512, char);
+
 	
 uint8_t rxStr[64];
 uint8_t txStr[64];
@@ -72,6 +75,10 @@ uint8_t rxPC, txPC, rxESP8266, txESP8266;
 uint8_t PC_txComplete = 0;
 
 char cmd[64];
+	
+OS_FIFO_Def(CAN_TxFifo, CAN_Message_t, 64);
+OS_FIFO_Def(CAN_RxFifo, CAN_Message_t, 64);
+
 
 uint8_t scratch_raw[1024];
 coap_rw_buffer_t scratch_buf = {scratch_raw, sizeof(scratch_raw)};
@@ -110,28 +117,36 @@ ESP8266_Return_t ESP8266_IPDCallback(ESP8266_WiFi_t* esp, uint32_t linkID, uint8
 	return ESP8266_OK;
 }
 
-void put_light_Callback(uint8_t state)
+uint32_t put_light_Callback(uint8_t state)
 {
-	HAL_GPIO_PinWrite(GPIOF, GPIO_PIN_3, state);
+	if (state == 2)
+	{
+		HAL_GPIO_PinToggle(GPIOF, GPIO_PIN_3);
+	}
+	else
+		HAL_GPIO_PinWrite(GPIOF, GPIO_PIN_3, state);
+	
+	return HAL_GPIO_PinRead(GPIOF, GPIO_PIN_3);
 }
 
-void blink(void)
+void put_robot_motor_Callback(int32_t speed)
 {
-     
-		while(1)
-		{
-//			//printf("Hello World\r\n");
-//			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, GPIO_PIN_3);
-
-//			OS_Sleep(1000);
-//			
-//			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, 0x0);
-//			
-//			OS_Sleep(1000);
-		}
-
+	static CAN_Message_t msg;
+	msg.u16Id = CAN_MSG_SET_DIRECTION;
+	msg.i32Msg = speed*125;
+	OS_FIFO_Put(&CAN_TxFifo, &msg);
 	
 }
+
+void put_robot_servo_Callback(int32_t angle)
+{
+	static CAN_Message_t msg;
+	msg.u16Id = CAN_MSG_SET_ANGLE;
+	msg.i32Msg = angle;
+	OS_FIFO_Put(&CAN_TxFifo, &msg);
+}
+
+
 
 
 extern ESP8266_WiFi_t esp8266;
@@ -158,6 +173,57 @@ void transparentUART(void)
 		gets(cmd);
 	}
 }
+
+
+
+void CAN_TxTask(void)
+{
+	CAN_Message_t txMsg;
+	for(;;)
+	{
+		OS_FIFO_Get(&CAN_TxFifo, &txMsg);
+		CAN0_SendData(txMsg.u16Id, txMsg.u8Msg);
+		HAL_GPIO_PinToggle(GPIOF, GPIO_PIN_3);
+	}
+}
+
+
+void CAN_RxCallback(uint16_t id, uint8_t* data)
+{
+	CAN_Message_t msg;
+	msg.u16Id = id;
+	memcpy(msg.u8Msg, data, 4);
+	OS_FIFO_Put(&CAN_RxFifo, &msg);
+}
+
+
+void blink(void)
+{
+		CAN_Message_t txMsg;
+		int32_t duty;
+	
+		while(1)
+		{
+			OS_Sleep(1000);
+			txMsg.u16Id = CAN_MSG_SET_DIRECTION;
+			txMsg.i32Msg = duty;
+			OS_FIFO_Put(&CAN_TxFifo, &txMsg);
+		duty += 1000;
+		if (duty > 11000)
+			duty = -12000;
+//			//printf("Hello World\r\n");
+//			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, GPIO_PIN_3);
+
+//			OS_Sleep(1000);
+//			
+//			GPIOPinWrite(GPIOF_BASE, GPIO_PIN_3, 0x0);
+//			
+//			OS_Sleep(1000);
+		}
+
+	
+}
+
 //debug code
 int main(void){
 
@@ -165,12 +231,19 @@ int main(void){
 	SysCtlClockFreqSet(SYSCTL_OSC_INT | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480, 80e6);
 	
 	OS_Init();
-	OS_AddThread(&blink, "Blink", OS_TASK_PRIORITY_HIGH);
+	
+	OS_FIFO_Init(&CAN_RxFifo);
+	OS_FIFO_Init(&CAN_TxFifo);
+	
+	//OS_AddThread(&blink, "Blink", OS_TASK_PRIORITY_HIGH);
 	OS_AddThread(&wifiThread, "WiFi", OS_TASK_PRIORITY_HIGH);
+	OS_AddThread(CAN_TxTask, "CAN Tx",  OS_TASK_PRIORITY_REALTIME);
+	
 	
 	HAL_GPIO_Init();
 	HAL_UART0_Init();
 	HAL_UART2_Init();	
+	CAN0_Open();
 	//HAL_UART_Receive(&uart0, rxStr, RX_LENGTH, PC_rxCompleteCallback);
 	
 	

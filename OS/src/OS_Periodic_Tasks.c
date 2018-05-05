@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "Timer1.h"
 #include "List.h"
 #include "OS_Config.h"
 #include "OS_Defs.h"
@@ -47,7 +48,9 @@ uint32_t periodicTaskCount = 0;
 void Timer1A_IRQ_Callback(void)
 {
 	for(int i = 0; i < periodicTaskCount; i++){
-		if(((Timer1_getCount() - periodicTCBs[i].start_time) >= periodicTCBs[i].period)){
+		if(((Timer1_getCount() - periodicTCBs[i].start_time) >= periodicTCBs[i].period) &&
+				periodicTCBs[i].task != NULL){
+			
 			periodicTCBs[i].task();
 			periodicTCBs[i].start_time = Timer1_getCount();
 		}

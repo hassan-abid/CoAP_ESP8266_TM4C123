@@ -60,7 +60,6 @@ extern OS_Log_t OS_log;
 #define		sizeof_array(arr)		(sizeof(arr) / sizeof(arr[0]))
 #endif
 
-#if OS_DEBUG_LOG == 1
 
 #define OS_LogEvent( task, _event)	\
 \
@@ -80,13 +79,6 @@ if (OS_log.count < sizeof_array(OS_log.logEntry))\
 		OS_log.logEntry[OS_log.count].info = _info;\
 	}\
 
-#else
-
-#define OS_LogEvent(...)
-#define OS_LogEventInfo(...)
-	
-#endif
-	
 #ifdef __cplusplus
 extern "C"{
 #endif 

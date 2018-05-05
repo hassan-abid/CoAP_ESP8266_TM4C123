@@ -188,7 +188,6 @@ void Scheduler(void)
 	}
 	
 	currentTCB = getNextReadyTask();
-	OS_LogEvent( currentTCB, OS_LOG_EVENT_FOREGROUND_TASK );
 	
 	
 }

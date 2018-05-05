@@ -10,7 +10,7 @@
 #include <string.h>
 #include "OS_FIFO.h"
 
-OS_FIFO_Def(Default_FIFO, uint8_t*, 1);
+OS_FIFO_Def(Default_FIFO, uint8_t, 1);
 typedef struct __Default_FIFO OS_FIFO_t;
 
 void DisableInterrupts(void); // Disable interrupts
@@ -62,7 +62,7 @@ void OS_FIFO_Put_Blocking(void* fifo, void* data)
 	OS_MutexWait(&_fifo->mutex);
 	
 	sr = StartCritical();
-	memcpy(&_fifo->buffer[_fifo->back], data, sizeof(_fifo->buffer[0]));
+	memcpy(_fifo->buffer + (_fifo->back *_fifo->elementSize), data, _fifo->elementSize);
 	
 	_fifo->back++;
 	_fifo->count++;
@@ -91,13 +91,13 @@ int OS_FIFO_Put(void* fifo, void* data)
 	uint32_t ret = 0;
 	
 	OS_FIFO_t* _fifo = fifo;
-	if (_fifo->count == _fifo->size || !OS_MutexAvailable(&_fifo->mutex))
+	if (_fifo->count == _fifo->size )
 	{
 		goto end;
 	}
 	OS_Wait(&_fifo->smphrRoomLeft);
 	
-	memcpy(&_fifo->buffer[_fifo->back], data, sizeof(_fifo->buffer[0]));
+	memcpy(_fifo->buffer + (_fifo->back*_fifo->elementSize), data, _fifo->elementSize);
 	_fifo->back++;
 	_fifo->count++;
 	if (_fifo->back == _fifo->size)
@@ -129,17 +129,18 @@ void OS_FIFO_Get(void* fifo, void* data)
 
 	sr = StartCritical();
 
-	memcpy(data, &_fifo->buffer[_fifo->front], sizeof(_fifo->buffer[0]));
+	memcpy(data, _fifo->buffer + (_fifo->front*_fifo->elementSize), _fifo->elementSize);
 	
 	_fifo->front++;
 	_fifo->count--;
 	if (_fifo->front == _fifo->size)
 		_fifo->front = 0;
-	
+
+	OS_Signal(&_fifo->smphrRoomLeft);
+	OS_MutexSignal(&_fifo->mutex);	
 	EndCritical(sr);
 
 
-	OS_Signal(&_fifo->smphrRoomLeft);
-	OS_MutexSignal(&_fifo->mutex);
+
 }
 /** @}*/

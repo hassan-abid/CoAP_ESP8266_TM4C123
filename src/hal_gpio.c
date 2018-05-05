@@ -66,4 +66,14 @@ HAL_Return_t HAL_GPIO_PinWrite(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins, uint8
 		HAL_GPIO_PinReset(port, pins);
 }
 
+HAL_Return_t HAL_GPIO_PinToggle(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins)
+{
+	return HAL_GPIO_PinWrite(port, pins, !GPIOPinRead((uint32_t)port, pins));
+}
+
+uint32_t HAL_GPIO_PinRead(HAL_GPIO_Port_t port, HAL_GPIO_Pins_t pins)
+{
+	return GPIOPinRead((uint32_t)port, pins);
+}
+
 /** @}*/
