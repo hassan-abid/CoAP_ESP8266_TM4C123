@@ -21,12 +21,13 @@ struct __##name\
 	uint32_t count;\
 	uint32_t front;\
 	uint32_t back;\
+	const uint32_t elementSize;\
 	OS_Semaphore_t smphrRoomLeft;\
 	OS_Semaphore_t smphrDataAvailable;\
 	OS_Mutex_t	mutex;\
 	dataType buffer[_size];\
 \
-} name = { .size = _size, .count = 0, .front = 0, .back = 0};
+} name = { .size = _size, .count = 0, .front = 0, .back = 0, .elementSize = sizeof(dataType)};
 
 
 #ifdef __cplusplus

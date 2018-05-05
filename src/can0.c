@@ -36,16 +36,18 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "hw_can.h"
-#include "hw_ints.h"
-#include "hw_memmap.h"
-#include "hw_types.h"
-#include "can.h"
-#include "debug.h"
-#include "interrupt.h"
+#include "inc/hw_can.h"
+#include "inc/hw_ints.h"
+#include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+#include "driverlib/can.h"
+#include "driverlib/debug.h"
+#include "driverlib/interrupt.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/gpio.h"
 
 #include "can0.h"
-#include "tm4c123gh6pmv2.h"
 
 
 #define NULL 0
@@ -70,7 +72,7 @@ void CAN0_Handler(void){ uint8_t data[4];
   uint32_t ulIntStatus, ulIDStatus;
   int i;
   tCANMsgObject xTempMsgObject;
-  xTempMsgObject.pucMsgData = data;
+  xTempMsgObject.pui8MsgData = data;
   ulIntStatus = CANIntStatus(CAN0_BASE, CAN_INT_STS_CAUSE); // cause?
   if(ulIntStatus & CAN_INT_INTID_STATUS){  // receive?
     ulIDStatus = CANStatusGet(CAN0_BASE, CAN_STS_NEWDAT);
@@ -83,7 +85,7 @@ void CAN0_Handler(void){ uint8_t data[4];
           RCVData[2] = data[2];
           RCVData[3] = data[3];
           MailFlag = true;   // new mail
-					CAN_RxCallback(xTempMsgObject.ulMsgID, RCVData);
+					CAN_RxCallback(xTempMsgObject.ui32MsgID, RCVData);
         //}
       }
     }
@@ -99,11 +101,11 @@ void static CAN0_Setup_Message_Object( uint32_t MessageID, \
                                 uint32_t ObjectID, \
                                 tMsgObjType eMsgType){
   tCANMsgObject xTempObject;
-  xTempObject.ulMsgID = MessageID;          // 11 or 29 bit ID
-	xTempObject.ulMsgIDMask = 0xFFFFFFFF;
-  xTempObject.ulMsgLen = MessageLength;
-  xTempObject.pucMsgData = MessageData;
-  xTempObject.ulFlags = MessageFlags;
+  xTempObject.ui32MsgID = MessageID;          // 11 or 29 bit ID
+	xTempObject.ui32MsgIDMask = 0xFFFFFFFF;
+  xTempObject.ui32MsgLen = MessageLength;
+  xTempObject.pui8MsgData = MessageData;
+  xTempObject.ui32Flags = MessageFlags;
   CANMessageSet(CAN0_BASE, ObjectID, &xTempObject, eMsgType);
 }
 // Initialize CAN port
@@ -111,32 +113,31 @@ void CAN0_Open(void){uint32_t volatile delay;
 
   MailFlag = false;
 
-  SYSCTL_RCGCCAN_R |= 0x00000001;  // CAN0 enable bit 0
-  SYSCTL_RCGCGPIO_R |= 0x00000010;  // RCGC2 portE bit 4
-  for(delay=0; delay<10; delay++){};
-  GPIO_PORTE_AFSEL_R |= 0x30; //PORTE AFSEL bits 5,4
-// PORTE PCTL 88 into fields for pins 5,4
-  GPIO_PORTE_PCTL_R = (GPIO_PORTE_PCTL_R&0xFF00FFFF)|0x00880000;
-  GPIO_PORTE_DEN_R |= 0x30;
-  GPIO_PORTE_DIR_R |= 0x20;
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_CAN0);
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+	GPIOPinConfigure(GPIO_PE4_CAN0RX);
+  GPIOPinConfigure(GPIO_PE5_CAN0TX);
+	
+	GPIOPinTypeCAN(GPIO_PORTE_BASE, GPIO_PIN_4 | GPIO_PIN_5);
       
   CANInit(CAN0_BASE);
-  CANBitRateSet(CAN0_BASE, 80000000, CAN_BITRATE);
+  CANBitRateSet(CAN0_BASE, SysCtlClockGet(), CAN_BITRATE);
   CANEnable(CAN0_BASE);
 // make sure to enable STATUS interrupts
   CANIntEnable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_ERROR | CAN_INT_STATUS);
 // Set up filter to receive these IDs
 // in this case there is just one type, but you could accept multiple ID types
-	for (int sensorType = 0; sensorType < 4 ; sensorType++)
+	/*for (int sensorType = 0; sensorType < 4 ; sensorType++)
 	{
 		for (int sensorId = 0 ; sensorId < 4 ; sensorId++)
 		{
 			int id = (sensorType << 2) + sensorId;
 			CAN0_Setup_Message_Object(id, MSG_OBJ_RX_INT_ENABLE, 4, NULL, id, MSG_OBJ_TYPE_RX);
 		}
-	}
-	NVIC_EN1_R = (1 << (INT_CAN0 - 48)); //IntEnable(INT_CAN0);
-  return;
+	}*/
+	//NVIC_EN1_R = (1 << (INT_CAN0 - 48)); //IntEnable(INT_CAN0);
+  IntEnable(INT_CAN0);
+	return;
 }
 
 // send 4 bytes of data to other microcontroller 
