@@ -149,6 +149,21 @@ ESP8266_Return_t ESP8266_configureAP(ESP8266_WiFi_t* esp, ESP8266_APConfig_t* co
 	
 }
 
+ESP8266_Return_t ESP8266_joinAP(ESP8266_WiFi_t* esp, ESP8266_APConfig_t* config)
+{
+	
+	HAL_ASSERT_RETURN(
+		AT_OK != AT_sendCommandf(esp->AT, 
+															AT_DELAY_DEFAULT,
+															"AT+CWJAP=\"%s\",\"%s\"\r\n", 
+															config->ssid, 
+															config->password),
+	ESP8266_ERROR);
+															
+	return ESP8266_OK;
+	
+}
+
 ESP8266_Return_t ESP8266_setMultipleConnections(ESP8266_WiFi_t* esp, uint8_t enable)
 {
 	if (enable != 0) enable = 1;
@@ -267,6 +282,7 @@ ESP8266_Return_t ESP8266_startUDPServer(ESP8266_WiFi_t* esp, uint32_t port)
 		dataPtr += iter;
 		dataLength = min(dataLength, sizeof(udpData));
 		memcpy(udpData, dataPtr, dataLength);
+		udpData[dataLength] = '\0';
 		//ESP8266_sendData(esp, linkID, (uint8_t*)udpData, dataLength);
 		ESP8266_IPDCallback(esp, linkID, udpData, dataLength);
 	}
@@ -296,17 +312,17 @@ ESP8266_Return_t ESP8266_Init(ESP8266_WiFi_t* esp)
 	HAL_ASSERT_RETURN(ret != ESP8266_OK, ret);
 	
 	//Configure Wifi as access point and station
-	ret = ESP8266_setWiFiMode(esp, ESP8266_WIFI_MODE_SOFTAP_STATION);
+	ret = ESP8266_setWiFiMode(esp, ESP8266_WIFI_MODE_SOFTAP);
 	HAL_ASSERT_RETURN(ret != ESP8266_OK, ret);
 
 	//Enable DHCP		
-	ret = ESP8266_setDHCP(esp, ESP8266_WIFI_MODE_SOFTAP_STATION, true);
-	HAL_ASSERT_RETURN(ret != ESP8266_OK, ret);
+	//ret = ESP8266_setDHCP(esp, ESP8266_WIFI_MODE_SOFTAP, true);
+	//HAL_ASSERT_RETURN(ret != ESP8266_OK, ret);
 	
 	//configure access point and start wifi station
 	apConfig.ssid = "ESP8266";
 	apConfig.password = "redhat@123";
-	apConfig.channelID = 1;
+	apConfig.channelID = 8;
 	apConfig.encryption = ESP8266_ENCRYPTION_WPA_WPA2_PSK;
 	
 	ret = ESP8266_configureAP(esp, &apConfig);

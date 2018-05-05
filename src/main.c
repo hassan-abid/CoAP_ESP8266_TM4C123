@@ -133,7 +133,7 @@ void put_robot_motor_Callback(int32_t speed)
 {
 	static CAN_Message_t msg;
 	msg.u16Id = CAN_MSG_SET_DIRECTION;
-	msg.i32Msg = speed;
+	msg.i32Msg = speed*125;
 	OS_FIFO_Put(&CAN_TxFifo, &msg);
 	
 }
