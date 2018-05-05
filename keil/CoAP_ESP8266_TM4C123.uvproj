@@ -450,6 +450,11 @@
               <FileType>1</FileType>
               <FilePath>..\driverlib\src\gpio.c</FilePath>
             </File>
+            <File>
+              <FileName>can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\driverlib\src\can.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -469,6 +474,11 @@
               <FileName>hal_gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\hal_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>can0.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\can0.c</FilePath>
             </File>
           </Files>
         </Group>
